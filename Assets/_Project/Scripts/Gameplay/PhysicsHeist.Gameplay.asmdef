@@ -2,7 +2,8 @@
     "name": "PhysicsHeist.Gameplay",
     "rootNamespace": "PhysicsHeist.Gameplay",
     "references": [
-        "PhysicsHeist.Core"
+        "PhysicsHeist.Core",
+        "Zenject"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

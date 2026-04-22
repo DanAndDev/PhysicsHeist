@@ -3,7 +3,8 @@
     "rootNamespace": "PhysicsHeist.Infrastructure",
     "references": [
         "PhysicsHeist.Core",
-        "Zenject"
+        "Zenject",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
