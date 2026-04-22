@@ -1,0 +1,17 @@
+{
+    "name": "PhysicsHeist.Presentation",
+    "rootNamespace": "PhysicsHeist.Presentation",
+    "references": [
+        "PhysicsHeist.Core",
+        "PhysicsHeist.Gameplay"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
