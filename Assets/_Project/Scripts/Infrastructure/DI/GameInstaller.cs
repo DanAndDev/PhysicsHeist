@@ -14,6 +14,9 @@ namespace PhysicsHeist.Infrastructure.DI
 
             Container.DeclareSignal<BootCompletedSignal>();
             Container.DeclareSignal<ObjectBrokenSignal>();
+            Container.DeclareSignal<ToolUsedSignal>();
+            Container.DeclareSignal<TriggerStateChangedSignal>();
+            Container.DeclareSignal<PuzzleSolvedSignal>();
 
             Container.Bind<ISignalBus>().To<ZenjectSignalBus>().AsSingle();
 
