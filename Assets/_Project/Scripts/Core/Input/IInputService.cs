@@ -8,5 +8,9 @@ namespace PhysicsHeist.Core.Input
         Vector2 Look { get; }
         bool JumpPressedThisFrame { get; }
         bool JumpHeld { get; }
+        bool PrimaryFirePressedThisFrame { get; }
+        bool PrimaryFireHeld { get; }
+        bool SecondaryFirePressedThisFrame { get; }
+        bool SecondaryFireHeld { get; }
     }
 }

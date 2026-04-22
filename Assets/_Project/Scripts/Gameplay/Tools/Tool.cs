@@ -10,12 +10,16 @@ namespace PhysicsHeist.Gameplay.Tools
         [SerializeField] private string displayName = "Tool";
         [SerializeField] private MonoBehaviour targetingStrategy;
         [SerializeField] private MonoBehaviour executionStrategy;
+        [SerializeField, Min(0f)] private float cooldown;
 
         private ITargetingStrategy _targeting;
         private IExecutionStrategy _execution;
+        private float _readyAt;
 
         public string DisplayName => displayName;
         public virtual bool IsReady => _targeting != null && _execution != null && isActiveAndEnabled;
+        public float Cooldown => cooldown;
+        public float NextReadyTime => _readyAt;
 
         public event Action<IToolAction, ToolUseResult, ToolTarget> Used;
 
@@ -35,11 +39,17 @@ namespace PhysicsHeist.Gameplay.Tools
             if (!IsReady)
                 return Report(ToolUseResult.Disabled, ToolTarget.None);
 
+            if (Time.time < _readyAt)
+                return Report(ToolUseResult.OnCooldown, ToolTarget.None);
+
             var target = _targeting.Resolve(in context);
             if (!target.Valid)
                 return Report(ToolUseResult.NoTarget, target);
 
             var result = Execute(in context, in target);
+            if (result == ToolUseResult.Success && cooldown > 0f)
+                _readyAt = Time.time + cooldown;
+
             return Report(result, target);
         }
 
