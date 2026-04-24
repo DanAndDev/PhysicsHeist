@@ -6,12 +6,18 @@ using Zenject;
 
 namespace PhysicsHeist.Gameplay.Tools
 {
+    /// <summary>
+    /// Primary Fire throws a physics charge in the aim direction; Secondary
+    /// Fire detonates all currently-live charges at once. No raycast / surface
+    /// requirement — the charge flies until it hits something and then sticks
+    /// via its own collision handler.
+    /// </summary>
     [DisallowMultipleComponent]
     public sealed class ExplosiveChargeController : MonoBehaviour
     {
         [SerializeField] private ExplosiveChargeConfig config;
         [SerializeField] private Transform aimOrigin;
-        [SerializeField] private Tool placeTool;
+        [SerializeField] private Tool throwTool;
         [SerializeField] private GameObject ownerRoot;
 
         private readonly List<ExplosiveCharge> _detonateBuffer = new();
@@ -27,23 +33,25 @@ namespace PhysicsHeist.Gameplay.Tools
         {
             if (_input == null || config == null || aimOrigin == null) return;
 
-            if (_input.PrimaryFirePressedThisFrame && placeTool != null)
-                Place();
+            if (_input.PrimaryFirePressedThisFrame && throwTool != null)
+                Throw();
 
             if (_input.SecondaryFirePressedThisFrame)
                 DetonateAll();
         }
 
-        private void Place()
+        private void Throw()
         {
             var owner = ownerRoot != null ? ownerRoot : gameObject;
+            // DirectTargetingStrategy ignores Range/LayerMask, but ToolContext
+            // still wants non-default values — we pass sentinels.
             var ctx = new ToolContext(
                 aimOrigin.position,
                 aimOrigin.forward,
-                config.PlacementRange,
+                range: 1f,
                 owner,
-                config.PlacementMask);
-            placeTool.TryUse(ctx);
+                layerMask: ~0);
+            throwTool.TryUse(ctx);
         }
 
         private void DetonateAll()

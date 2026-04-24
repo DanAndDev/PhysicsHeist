@@ -10,21 +10,18 @@ namespace PhysicsHeist.Gameplay.Tools
         [SerializeField, Min(0.1f)] private float range = 25f;
         [SerializeField] private LayerMask targetMask = ~0;
 
-        [Header("Forces")]
-        [SerializeField, Min(0f)] private float pullImpulse = 12f;
-        [SerializeField, Min(0f)] private float pushImpulse = 20f;
-        [SerializeField, Min(0f)] private float minImpulseDistance = 0.5f;
-
-        [Header("Timing")]
-        [SerializeField, Min(0f)] private float pullCooldown = 0.1f;
-        [SerializeField, Min(0f)] private float pushCooldown = 0.25f;
+        [Header("Forces (continuous, newtons)")]
+        [Tooltip("Continuous force (N) applied to the hit rigidbody toward the gun while Primary Fire is held.")]
+        [SerializeField, Min(0f)] private float pullForce = 60f;
+        [Tooltip("Continuous force (N) applied to the hit rigidbody away from the gun while Secondary Fire is held.")]
+        [SerializeField, Min(0f)] private float pushForce = 120f;
+        [Tooltip("Ignore the target when closer than this (prevents jitter at the muzzle).")]
+        [SerializeField, Min(0f)] private float minForceDistance = 0.5f;
 
         public float Range => range;
         public LayerMask TargetMask => targetMask;
-        public float PullImpulse => pullImpulse;
-        public float PushImpulse => pushImpulse;
-        public float MinImpulseDistance => minImpulseDistance;
-        public float PullCooldown => pullCooldown;
-        public float PushCooldown => pushCooldown;
+        public float PullForce => pullForce;
+        public float PushForce => pushForce;
+        public float MinForceDistance => minForceDistance;
     }
 }

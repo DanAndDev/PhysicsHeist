@@ -4,6 +4,12 @@ using UnityEngine;
 
 namespace PhysicsHeist.Gameplay.Tools
 {
+    /// <summary>
+    /// Continuous push: applies <see cref="MagneticGunConfig.PushForce"/> in
+    /// newtons along the origin-to-target vector, at the hit point so the
+    /// object also gets a plausible torque. See <see cref="MagneticPullExecution"/>
+    /// for the framerate note.
+    /// </summary>
     [DisallowMultipleComponent]
     public sealed class MagneticPushExecution : MonoBehaviour, IExecutionStrategy
     {
@@ -15,15 +21,15 @@ namespace PhysicsHeist.Gameplay.Tools
 
             var fromOrigin = target.Rigidbody.worldCenterOfMass - context.Origin;
             var distance = fromOrigin.magnitude;
-            if (distance < config.MinImpulseDistance) return;
+            if (distance < config.MinForceDistance) return;
 
-            var impulse = (fromOrigin / distance) * config.PushImpulse;
+            var force = (fromOrigin / distance) * config.PushForce;
 
             var receiver = target.Rigidbody.GetComponent<IForceReceiver>();
             if (receiver != null)
-                receiver.ApplyForceAtPoint(impulse, target.Point, ForceMode.Impulse);
+                receiver.ApplyForceAtPoint(force, target.Point, ForceMode.Force);
             else
-                target.Rigidbody.AddForceAtPosition(impulse, target.Point, ForceMode.Impulse);
+                target.Rigidbody.AddForceAtPosition(force, target.Point, ForceMode.Force);
         }
     }
 }

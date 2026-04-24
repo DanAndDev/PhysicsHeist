@@ -5,6 +5,13 @@ using Zenject;
 
 namespace PhysicsHeist.Gameplay.Tools
 {
+    /// <summary>
+    /// Drives pull / push while the corresponding mouse button is HELD,
+    /// not just on the initial press. Each frame we re-raycast and re-apply
+    /// force via the underlying <see cref="Tool"/> — the Tool cooldown is
+    /// expected to be 0 for this controller so presses-per-second doesn't
+    /// gate the continuous effect.
+    /// </summary>
     [DisallowMultipleComponent]
     public sealed class MagneticGunController : MonoBehaviour
     {
@@ -26,10 +33,10 @@ namespace PhysicsHeist.Gameplay.Tools
         {
             if (_input == null || config == null || aimOrigin == null) return;
 
-            if (_input.PrimaryFirePressedThisFrame && pullTool != null)
+            if (_input.PrimaryFireHeld && pullTool != null)
                 Fire(pullTool);
 
-            if (_input.SecondaryFirePressedThisFrame && pushTool != null)
+            if (_input.SecondaryFireHeld && pushTool != null)
                 Fire(pushTool);
         }
 

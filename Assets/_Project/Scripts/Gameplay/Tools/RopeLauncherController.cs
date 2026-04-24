@@ -5,6 +5,19 @@ using Zenject;
 
 namespace PhysicsHeist.Gameplay.Tools
 {
+    /// <summary>
+    /// Primary Fire toggles the rope — press once to fire, press again to
+    /// release. Secondary Fire (held) winds the rope in, shortening the max
+    /// distance so the SpringJoint reels the two endpoints together.
+    ///
+    /// Mass weighting is automatic via <see cref="SpringJoint"/>:
+    ///  • Anchor with no Rigidbody (world geometry) → connectedBody is null,
+    ///    so the spring force acts only on the player.
+    ///  • Anchor with a Rigidbody → equal-and-opposite forces are applied to
+    ///    player and anchor; with F=ma, the lighter body accelerates more,
+    ///    so pulling a 10-ton statue barely moves it while a crate comes to
+    ///    the player.
+    /// </summary>
     [DisallowMultipleComponent]
     public sealed class RopeLauncherController : MonoBehaviour
     {
@@ -26,8 +39,13 @@ namespace PhysicsHeist.Gameplay.Tools
         {
             if (_input == null || config == null || aimOrigin == null) return;
 
-            if (_input.PrimaryFirePressedThisFrame && shotTool != null)
-                Fire();
+            if (_input.PrimaryFirePressedThisFrame)
+            {
+                if (shotExecution != null && shotExecution.HasActiveRope)
+                    shotExecution.ReleaseActive();
+                else if (shotTool != null)
+                    Fire();
+            }
 
             if (_input.SecondaryFireHeld && shotExecution != null && shotExecution.HasActiveRope)
                 shotExecution.WindIn(config.WindSpeed * Time.deltaTime);

@@ -6,10 +6,10 @@ namespace PhysicsHeist.Gameplay.Tools
     [CreateAssetMenu(menuName = "PhysicsHeist/Tools/Explosive Charge Config", fileName = "ExplosiveChargeConfig")]
     public sealed class ExplosiveChargeConfig : ConfigAsset
     {
-        [Header("Placement")]
-        [SerializeField, Min(0.1f)] private float placementRange = 5f;
-        [SerializeField] private LayerMask placementMask = ~0;
-        [SerializeField, Min(0f)] private float placementCooldown = 0.5f;
+        [Header("Throw")]
+        [Tooltip("Minimum gap between thrown charges (seconds).")]
+        [SerializeField, Min(0f)] private float throwCooldown = 0.35f;
+        [Tooltip("How many charges can be live at once. Throws are suppressed past this cap.")]
         [SerializeField, Min(1)] private int maxActiveCharges = 3;
 
         [Header("Fuse")]
@@ -22,9 +22,7 @@ namespace PhysicsHeist.Gameplay.Tools
         [SerializeField, Min(0f)] private float blastDamage = 75f;
         [SerializeField] private LayerMask blastMask = ~0;
 
-        public float PlacementRange => placementRange;
-        public LayerMask PlacementMask => placementMask;
-        public float PlacementCooldown => placementCooldown;
+        public float ThrowCooldown => throwCooldown;
         public int MaxActiveCharges => maxActiveCharges;
         public float FuseTime => fuseTime;
         public bool AutoDetonate => autoDetonate;

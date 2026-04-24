@@ -8,11 +8,15 @@ namespace PhysicsHeist.Infrastructure.Input
 {
     internal sealed class InputService : IInputService, IInitializable, IDisposable
     {
+        private const int ToolSlotCount = 3;
+
         private readonly InputAction _move;
         private readonly InputAction _look;
         private readonly InputAction _jump;
         private readonly InputAction _primaryFire;
         private readonly InputAction _secondaryFire;
+        private readonly InputAction _toolCycle;
+        private readonly InputAction[] _toolSlots;
 
         public InputService()
         {
@@ -29,6 +33,23 @@ namespace PhysicsHeist.Infrastructure.Input
 
             _primaryFire = new InputAction("PrimaryFire", InputActionType.Button, "<Mouse>/leftButton");
             _secondaryFire = new InputAction("SecondaryFire", InputActionType.Button, "<Mouse>/rightButton");
+
+            // Tab cycles tools; scroll wheel is bound as a second path so either
+            // works. We use the scroll "up" direction so a single notch up
+            // triggers one cycle; scroll "down" is left for future reverse-cycle.
+            _toolCycle = new InputAction("ToolCycle", InputActionType.Button);
+            _toolCycle.AddBinding("<Keyboard>/tab");
+            _toolCycle.AddBinding("<Mouse>/scroll/y").WithProcessor("scaleVector2(x=0,y=1)");
+
+            _toolSlots = new InputAction[ToolSlotCount];
+            for (var i = 0; i < ToolSlotCount; i++)
+            {
+                var keyDigit = (i + 1).ToString();
+                _toolSlots[i] = new InputAction(
+                    $"ToolSlot{i}",
+                    InputActionType.Button,
+                    $"<Keyboard>/{keyDigit}");
+            }
         }
 
         public Vector2 Move => _move.ReadValue<Vector2>();
@@ -39,6 +60,18 @@ namespace PhysicsHeist.Infrastructure.Input
         public bool PrimaryFireHeld => _primaryFire.IsPressed();
         public bool SecondaryFirePressedThisFrame => _secondaryFire.WasPressedThisFrame();
         public bool SecondaryFireHeld => _secondaryFire.IsPressed();
+        public bool ToolCyclePressedThisFrame => _toolCycle.WasPressedThisFrame();
+
+        public int ToolSlotSelectedThisFrame
+        {
+            get
+            {
+                for (var i = 0; i < _toolSlots.Length; i++)
+                    if (_toolSlots[i].WasPressedThisFrame())
+                        return i;
+                return -1;
+            }
+        }
 
         public void Initialize()
         {
@@ -47,6 +80,8 @@ namespace PhysicsHeist.Infrastructure.Input
             _jump.Enable();
             _primaryFire.Enable();
             _secondaryFire.Enable();
+            _toolCycle.Enable();
+            foreach (var slot in _toolSlots) slot.Enable();
         }
 
         public void Dispose()
@@ -56,6 +91,8 @@ namespace PhysicsHeist.Infrastructure.Input
             _jump.Dispose();
             _primaryFire.Dispose();
             _secondaryFire.Dispose();
+            _toolCycle.Dispose();
+            foreach (var slot in _toolSlots) slot.Dispose();
         }
     }
 }

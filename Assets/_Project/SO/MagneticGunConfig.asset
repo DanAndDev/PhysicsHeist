@@ -11,13 +11,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7f8cd10b49d458979501bef3f8c72dde, type: 3}
   m_Name: MagneticGunConfig
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   range: 25
   targetMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  pullImpulse: 60
-  pushImpulse: 80
-  minImpulseDistance: 0.5
-  pullCooldown: 0.1
-  pushCooldown: 0.25
+  pullForce: 60
+  pushForce: 120
+  minForceDistance: 0.5

@@ -4,6 +4,14 @@ using UnityEngine;
 
 namespace PhysicsHeist.Gameplay.Tools
 {
+    /// <summary>
+    /// Continuous pull: applies <see cref="MagneticGunConfig.PullForce"/> in
+    /// newtons along the target-to-origin vector. Called every frame while
+    /// Primary Fire is held — Unity's physics system accumulates ForceMode.Force
+    /// contributions added during Update and integrates them in the next
+    /// FixedUpdate, so a steady per-Update call produces a steady continuous
+    /// force regardless of framerate.
+    /// </summary>
     [DisallowMultipleComponent]
     public sealed class MagneticPullExecution : MonoBehaviour, IExecutionStrategy
     {
@@ -15,15 +23,15 @@ namespace PhysicsHeist.Gameplay.Tools
 
             var toOrigin = context.Origin - target.Rigidbody.worldCenterOfMass;
             var distance = toOrigin.magnitude;
-            if (distance < config.MinImpulseDistance) return;
+            if (distance < config.MinForceDistance) return;
 
-            var impulse = (toOrigin / distance) * config.PullImpulse;
+            var force = (toOrigin / distance) * config.PullForce;
 
             var receiver = target.Rigidbody.GetComponent<IForceReceiver>();
             if (receiver != null)
-                receiver.ApplyForce(impulse, ForceMode.Impulse);
+                receiver.ApplyForce(force, ForceMode.Force);
             else
-                target.Rigidbody.AddForce(impulse, ForceMode.Impulse);
+                target.Rigidbody.AddForce(force, ForceMode.Force);
         }
     }
 }

@@ -8,6 +8,10 @@ namespace PhysicsHeist.Gameplay.Player
     [DisallowMultipleComponent]
     public sealed class PlayerController : MonoBehaviour
     {
+        // Shared across all PlayerController instances — grounding is resolved
+        // synchronously inside FixedUpdate, so reuse is safe.
+        private static readonly Collider[] GroundOverlapBuffer = new Collider[8];
+
         [SerializeField] private PlayerConfig config;
         [SerializeField] private Transform groundCheckOrigin;
 
@@ -81,18 +85,37 @@ namespace PhysicsHeist.Gameplay.Player
 
         private bool CheckGrounded()
         {
+            // We want an overlap test, not a sweep — Physics.SphereCast ignores
+            // initial overlaps, which is why the earlier version never fired:
+            // the check sphere already intersected the floor at t=0.
+            //
+            // The catch with a plain CheckSphere is that the ground mask
+            // defaults to Everything, so the overlap also picks up the
+            // player's own capsule collider (the capsule bottom sits at the
+            // same height as the ground line). That would report "grounded"
+            // eternally — including mid-air — so we use OverlapSphereNonAlloc
+            // and skip any collider that belongs to the player hierarchy.
             var origin = groundCheckOrigin != null
                 ? groundCheckOrigin.position
                 : transform.position + Vector3.up * 0.1f;
 
-            return UnityEngine.Physics.SphereCast(
+            var count = UnityEngine.Physics.OverlapSphereNonAlloc(
                 origin,
                 config.groundCheckRadius,
-                Vector3.down,
-                out _,
-                config.groundCheckDistance,
+                GroundOverlapBuffer,
                 config.groundMask,
                 QueryTriggerInteraction.Ignore);
+
+            var grounded = false;
+            for (var i = 0; i < count; i++)
+            {
+                var col = GroundOverlapBuffer[i];
+                GroundOverlapBuffer[i] = null;
+                if (col == null) continue;
+                if (col.transform.IsChildOf(transform)) continue;
+                grounded = true;
+            }
+            return grounded;
         }
     }
 }
